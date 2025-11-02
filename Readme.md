@@ -1,0 +1,4 @@
+- [umka-lang](https://vtereshkov.github.io/umka-lang/)
+- You need to build ukma and copy `umka_linux/` in this repo.
+- You can test the **hello.um**: `./umka_linux/umka hello.um`
+- Or run it within Zig: `zig build run`
