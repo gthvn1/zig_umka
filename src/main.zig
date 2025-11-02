@@ -5,21 +5,23 @@ const umka = @cImport({
 
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
+
+    // Get arguments
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
 
-    // We need to convert args into argc,argv available in C.
-    var c_args = try allocator.alloc([*c]const u8, args.len);
-    defer allocator.free(c_args);
+    // Convert args to argc,argv
+    var c_argv = try allocator.alloc([*c]u8, args.len);
+    defer allocator.free(c_argv);
 
     for (args, 0..) |arg, i| {
-        c_args[i] = arg.ptr;
+        c_argv[i] = @constCast(arg.ptr);
     }
 
     // Parameters used for the initialization
     // Allocate memory for the interpreter
     const handler = umka.umkaAlloc() orelse {
-        std.debug.print("Failed to allocate memory for interpreter\n", .{});
+        std.log.err("Failed to allocate memory for interpreter", .{});
         return;
     };
     defer umka.umkaFree(handler);
@@ -30,8 +32,8 @@ pub fn main() !void {
     const file_system_enabled = false;
     const impl_libs_enabled = false;
     const warning_callback: umka.UmkaWarningCallback = null;
-    const argc: c_int = @intCast(args.len);
-    const argv: [*c][*c]u8 = @ptrCast(c_args.ptr);
+    const argc: c_int = @intCast(c_argv.len);
+    const argv: [*c][*c]u8 = c_argv.ptr;
 
     const init_ok = umka.umkaInit(
         handler,
@@ -47,40 +49,34 @@ pub fn main() !void {
     );
 
     if (!init_ok) {
-        std.debug.print("Failed to initialize the interpreter instance\n", .{});
-        const err_ptr = umka.umkaGetError(handler);
-        if (err_ptr) |err| {
-            std.debug.print("Error: {s}\n", .{err.*.msg});
-        } else {
-            std.debug.print("No error can be reported\n", .{});
-        }
+        logUmkaError(handler, "Failed to initialize the interpreter instance");
         return;
     }
 
-    std.debug.print("Instance initialized\n", .{});
+    std.log.info("Instance initialized", .{});
 
     const compile_ok = umka.umkaCompile(handler);
     if (!compile_ok) {
-        std.debug.print("Failed to compile source file\n", .{});
-        const err_ptr = umka.umkaGetError(handler);
-        if (err_ptr) |err| {
-            std.debug.print("Error: {s}\n", .{err.*.msg});
-        } else {
-            std.debug.print("No error can be reported\n", .{});
-        }
+        logUmkaError(handler, "Failed to compile source file");
         return;
     }
 
     const run_ok = umka.umkaRun(handler);
     if (run_ok == 0) {
-        std.debug.print("Program finishes successfully\n", .{});
+        std.log.info("Program finishes successfully", .{});
     } else {
-        std.debug.print("Program failed to execute\n", .{});
-        const err_ptr = umka.umkaGetError(handler);
+        logUmkaError(handler, "Program failed to execute");
+    }
+}
+
+fn logUmkaError(handler: ?*anyopaque, msg: []const u8) void {
+    if (handler) |h| {
+        std.log.err("{s}", .{msg});
+        const err_ptr = umka.umkaGetError(h);
         if (err_ptr) |err| {
-            std.debug.print("Error: {s}\n", .{err.*.msg});
+            std.log.err("{s}", .{err.*.msg});
         } else {
-            std.debug.print("No error can be reported\n", .{});
+            std.log.err("No error can be reported", .{});
         }
     }
 }
