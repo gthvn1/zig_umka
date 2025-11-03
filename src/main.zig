@@ -63,7 +63,7 @@ pub fn main() !void {
 
     const run_ok = umka.umkaRun(handler);
     if (run_ok == 0) {
-        std.log.info("Program finishes successfully", .{});
+        std.log.info("Program finished successfully", .{});
     } else {
         logUmkaError(handler, "Program failed to execute");
     }
