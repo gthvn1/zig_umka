@@ -7,7 +7,7 @@
 ```
 ❯ zig build run
 info: Interpreter initialized
-info: Program compiled succeefully
+info: Program compiled successfully
 Hello, Sailor!
 info: Program finished successfully
 ```

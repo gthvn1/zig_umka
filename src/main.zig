@@ -40,7 +40,7 @@ pub fn main() !void {
     std.log.info("Interpreter initialized", .{});
 
     try compileProgram(interp);
-    std.log.info("Program compiled succeefully", .{});
+    std.log.info("Program compiled successfully", .{});
 
     try runProgram(interp);
     std.log.info("Program finished successfully", .{});
@@ -52,7 +52,7 @@ fn initInterpreter(interp: ?*anyopaque, filename: [*c]const u8, c_args: [][*c]u8
 
     // Naming parameters allow us to remember what they are used for
     const source_string = null;
-    const stack_size = 4096;
+    const stack_size = 2048; // with 1024 we got a stack overflow
     const file_system_enabled = false;
     const impl_libs_enabled = false;
     const warning_callback: umka.UmkaWarningCallback = null;
