@@ -6,7 +6,8 @@
 - Or run it from **Zig**:
 ```
 ❯ zig build run
-info: Instance initialized
+info: Interpreter initialized
+info: Program compiled succeefully
 Hello, Sailor!
 info: Program finished successfully
 ```
