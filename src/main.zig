@@ -29,11 +29,13 @@ fn runEngine() !void {
 
     var timer = try std.time.Timer.start();
 
-    var frame: usize = 1;
+    var frame: usize = 0; // incremented at the beginning of the loop
 
     while (frame <= 600) {
         const delta_time_ns = timer.lap();
         const dt: f64 = @floatFromInt(delta_time_ns);
+
+        frame += 1;
 
         // The frame logic will go there
         if (@mod(frame, fps) == 0) {
@@ -49,8 +51,6 @@ fn runEngine() !void {
         if (elapsed_time_ns < frame_time_ns) {
             std.posix.nanosleep(0, frame_time_ns - elapsed_time_ns);
         }
-
-        frame += 1;
     }
 }
 
