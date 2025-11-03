@@ -14,11 +14,11 @@ pub fn main() !void {
     const allocator = std.heap.page_allocator;
 
     // Allocate memory for the interpreter
-    const handler = umka.umkaAlloc() orelse {
+    const interp = umka.umkaAlloc() orelse {
         std.log.err("Failed to allocate memory for interpreter", .{});
         return UmkaError.Alloc;
     };
-    defer umka.umkaFree(handler);
+    defer umka.umkaFree(interp);
 
     // Get arguments
     const args = try std.process.argsAlloc(allocator);
@@ -36,17 +36,17 @@ pub fn main() !void {
     }
 
     // TODO: pass the filename as an argument to our program
-    try initInterpreter(handler, "hello.um", c_args);
+    try initInterpreter(interp, "hello.um", c_args);
     std.log.info("Interpreter initialized", .{});
 
-    try compileProgram(handler);
+    try compileProgram(interp);
     std.log.info("Program compiled succeefully", .{});
 
-    try runProgram(handler);
+    try runProgram(interp);
     std.log.info("Program finished successfully", .{});
 }
 
-fn initInterpreter(handler: ?*anyopaque, filename: [*c]const u8, c_args: [][*c]u8) !void {
+fn initInterpreter(interp: ?*anyopaque, filename: [*c]const u8, c_args: [][*c]u8) !void {
     const argc: c_int = @intCast(c_args.len);
     const argv: [*c][*c]u8 = c_args.ptr;
 
@@ -58,7 +58,7 @@ fn initInterpreter(handler: ?*anyopaque, filename: [*c]const u8, c_args: [][*c]u
     const warning_callback: umka.UmkaWarningCallback = null;
 
     const init_ok = umka.umkaInit(
-        handler,
+        interp,
         filename,
         source_string,
         stack_size,
@@ -71,29 +71,29 @@ fn initInterpreter(handler: ?*anyopaque, filename: [*c]const u8, c_args: [][*c]u
     );
 
     if (!init_ok) {
-        logUmkaError(handler, "Failed to initialize the interpreter instance");
+        logUmkaError(interp, "Failed to initialize the interpreter instance");
         return UmkaError.Init;
     }
 }
 
-fn compileProgram(handler: ?*anyopaque) !void {
-    const compile_ok = umka.umkaCompile(handler);
+fn compileProgram(interp: ?*anyopaque) !void {
+    const compile_ok = umka.umkaCompile(interp);
     if (!compile_ok) {
-        logUmkaError(handler, "Failed to compile source file");
+        logUmkaError(interp, "Failed to compile source file");
         return UmkaError.Compile;
     }
 }
 
-fn runProgram(handler: ?*anyopaque) !void {
-    const run_ok = umka.umkaRun(handler);
+fn runProgram(interp: ?*anyopaque) !void {
+    const run_ok = umka.umkaRun(interp);
     if (run_ok != 0) {
-        logUmkaError(handler, "Failed to run the program");
+        logUmkaError(interp, "Failed to run the program");
         return UmkaError.Run;
     }
 }
 
-fn logUmkaError(handler: ?*anyopaque, msg: []const u8) void {
-    if (handler) |h| {
+fn logUmkaError(interp: ?*anyopaque, msg: []const u8) void {
+    if (interp) |h| {
         const err_ptr = umka.umkaGetError(h);
         if (err_ptr) |err| {
             std.log.err("{s}: {s}", .{ msg, err.*.msg });
@@ -101,6 +101,6 @@ fn logUmkaError(handler: ?*anyopaque, msg: []const u8) void {
             std.log.err("{s}: (no additional info)", .{msg});
         }
     } else {
-        std.log.err("{s}: (null handler)", .{msg});
+        std.log.err("{s}: (null interp)", .{msg});
     }
 }
