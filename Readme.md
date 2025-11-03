@@ -1,4 +1,6 @@
-- [umka-lang](https://vtereshkov.github.io/umka-lang/)
-- You need to build **umka** and copy `umka_linux/` in this repo.
+- [ziglang](https://ziglang.org)
+- [umka-lang](https://github.com/vtereshkov/umka-lang)
+- It is tested using **Zig v0.15.2** and **Umka 1.5.4**.
+- You need to build **Umka** and copy `umka_linux/` in this repo.
 - You can test the **hello.um**: `./umka_linux/umka hello.um`
 - Or run it within Zig: `zig build run`
