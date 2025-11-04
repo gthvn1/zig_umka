@@ -21,7 +21,7 @@ pub const Engine = struct {
 
         var frame: usize = 0; // incremented at the beginning of the loop
 
-        while (frame <= 600) {
+        while (frame <= 300) {
             const delta_time_ns = timer.lap();
             const dt: f64 = @floatFromInt(delta_time_ns);
 
@@ -42,6 +42,8 @@ pub const Engine = struct {
                 std.posix.nanosleep(0, frame_time_ns - elapsed_time_ns);
             }
         }
+
+        self.term.writeInfo("Done", .{});
     }
 
     fn callEngineRender(self: *const Engine) void {

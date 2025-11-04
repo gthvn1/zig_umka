@@ -36,22 +36,8 @@ pub const ScriptRunner = struct {
     }
 
     pub fn run(self: *const ScriptRunner, filename: []const u8) !void {
-        // Get arguments
-        const args = try std.process.argsAlloc(self.allocator);
-        defer std.process.argsFree(self.allocator, args);
-
-        // Convert args to argc,argv
-        var c_args = try self.allocator.alloc([*c]u8, args.len);
-        defer self.allocator.free(c_args);
-
-        for (args, 0..) |arg, i| {
-            // If we understand correctly umkaInit expects [*c]u8 but
-            // arg.ptr won't be mutated. So @constCast should be safe.
-            // We need to double check how c_args is used by umka.
-            c_args[i] = @constCast(arg.ptr);
-        }
-
-        try self.initInterpreter(filename.ptr, c_args);
+        // TODO: pass some parameters to the script
+        try self.initInterpreter(filename.ptr);
         self.term.writeInfo("Interpreter initialized.", .{});
 
         try self.compileProgram();
@@ -61,13 +47,12 @@ pub const ScriptRunner = struct {
         self.term.writeInfo("Program finished successfully", .{});
     }
 
-    fn initInterpreter(self: *const ScriptRunner, filename: [*c]const u8, c_args: [][*c]u8) !void {
-        const argc: c_int = @intCast(c_args.len);
-        const argv: [*c][*c]u8 = c_args.ptr;
-
+    fn initInterpreter(self: *const ScriptRunner, filename: [*c]const u8) !void {
         // Naming parameters allow us to remember what they are used for
         const source_string = null;
         const stack_size = 2048; // with 1024 we got a stack overflow
+        const argc = 0;
+        const argv = null;
         const file_system_enabled = false;
         const impl_libs_enabled = false;
         const warning_callback: umka.UmkaWarningCallback = null;
