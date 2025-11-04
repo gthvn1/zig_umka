@@ -6,10 +6,16 @@
 - Or run it from **Zig**:
 ```bash
 ❯ zig build run
-info: Interpreter initialized
+info: Interpreter initialized.
 info: Program compiled successfully
 Hello, Sailor!
 info: Program finished successfully
+debug: Frame #60, dt = 0.016886079 seconds
+debug: Frame #120, dt = 0.01675991 seconds
+debug: Frame #180, dt = 0.016753295 seconds
+debug: Frame #240, dt = 0.01676282 seconds
+debug: Frame #300, dt = 0.016911458 seconds
+info: Done
 ```
 - The nice part is that once it's compiled, you can modify the
 Umka script *hello.um* and run it without recompiling the
